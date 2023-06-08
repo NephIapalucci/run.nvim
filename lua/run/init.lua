@@ -7,10 +7,14 @@ local file_to_language = {
 }
 
 local run_commands = {
-	rust = "cargo run",
-	zig = "zig build run"
+	c = function()
+		local path = vim.cmd("echo @%%")
+		local base_name = path:gsub("%.c")
+		return "gcc -o " .. base_name .. path .. " && ./" .. base_name
+	end,
+	rust = function() return "cargo run" end,
+	zig = function() return "zig build run" end
 }
-
 local extension_to_language = {
 	bash = "bash",
 	c = "c",
@@ -90,7 +94,7 @@ end
 
 M.run = function()
 	local language = get_project_language()
-	local command = run_commands[language]
+	local command = run_commands[language]()
 	vim.cmd("!" .. command)
 end
 
